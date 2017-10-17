@@ -3,6 +3,7 @@
  */
 package cs460_hw1;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class CaeserCipher {
@@ -24,6 +25,7 @@ public class CaeserCipher {
                     System.out.print("Enter number of letter to jump: ");
                     n = input.nextInt();
                     input.nextLine();
+                    plaintext = plaintext.toUpperCase();
                     System.out.println("ciphertext: " + 
                             encrypt(plaintext, (n % 26)));
                     break;
@@ -33,23 +35,32 @@ public class CaeserCipher {
                     System.out.print("Enter number of letter jumped: ");
                     n = input.nextInt();
                     input.nextLine();
+                    ciphertext = ciphertext.toUpperCase();
                     System.out.println("plaintext: " + 
                             decrypt(ciphertext, (n % 26)));
                     break;
                 case 3:
                     System.out.print("Enter ciphertext: ");
                     String text = input.nextLine();
-                    double lowest = Double.MAX_VALUE;
-                    String lowestText = "";
+                    System.out.print("Number of possible plaintext to show: ");
+                    int possible = input.nextInt();
+                    input.nextLine();
+                    double[] freqList = new double[26];
+                    String[] textList = new String[26];
                     for (int i = 0; i < 26; i++) {
-                        String decoded = decrypt(text, i);
-                        double ent = freq(decoded);
-                        if(ent < lowest) {
-                            lowest = ent;
-                            lowestText = decoded;
-                        }
+                        String decodedText = decrypt(text, i);
+                        double ent = freq(decodedText);
+                        freqList[i] = ent;
+                        textList[i] = decodedText;
                     }
-                    System.out.print("Decoded text: " + lowestText);
+                    if(possible > 26) {
+                        possible = 26;
+                    }
+                    sort(freqList, textList);
+                    System.out.println("Results: ");
+                    for (int i = 0; i < possible; i++) {
+                        System.out.println(textList[i]);
+                    }
                     break;
                 case 4:
                     break;
@@ -71,7 +82,7 @@ public class CaeserCipher {
                 re2[i] = (char) (re2[i] + n);
                 
                 //loop back when it is bigger than Z or z
-                if((re2[i] > 'Z' && re2[i] < 'a') || (re2[i] > 'z')) {
+                if(re2[i] > 'Z') {
                     re2[i] = (char) (re2[i] - 26);
                 }
             }
@@ -92,7 +103,7 @@ public class CaeserCipher {
                 re2[i] = (char) (re2[i] - n);
                 
                 //loop back when it is less than A or a
-                if((re2[i] < 'A') || (re2[i] > 'Z' && re2[i] < 'a')) {
+                if(re2[i] < 'A') {
                     re2[i] = (char) (re2[i] + 26);
                 }
             }
@@ -119,5 +130,21 @@ public class CaeserCipher {
             }
         }
         return res;
+    }
+    
+    private static void sort(double[] f, String[] t) {
+        for(int i = f.length - 1; i >= 0; i--) {
+            for (int j = 1; j <= i; j++) {
+                if (f[j - 1] > f[j]) {
+                    double tempF = f[j - 1];
+                    f[j - 1] = f[j];
+                    f[j] = tempF;
+                    
+                    String tempT = t[j - 1];
+                    t[j - 1] = t[j];
+                    t[j] = tempT;
+                }
+            }
+        }
     }
 }
